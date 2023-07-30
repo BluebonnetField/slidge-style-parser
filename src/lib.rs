@@ -211,7 +211,7 @@ fn get_block_indicator_size(keyword: char) -> usize {
 }
 
 #[pymodule]
-fn style_parser(_py: Python, m: &PyModule) -> PyResult<()> {
+fn slidge_style_parser(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(format_body, m)?)?;
     Ok(())
 }

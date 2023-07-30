@@ -1,4 +1,4 @@
-from style_parser import format_body
+from slidge_style_parser import format_body
 
 MATRIX_FORMATS = {
     "_": ("<em>", "</em>"),

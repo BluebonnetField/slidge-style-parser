@@ -1,11 +1,11 @@
 [package]
-name = "style-parser"
+name = "slidge-style-parser"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-name = "style_parser"
+name = "slidge_style_parser"
 crate-type = ["cdylib"]
 
 [dependencies]
