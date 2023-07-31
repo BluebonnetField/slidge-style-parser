@@ -12,5 +12,10 @@ classifiers = [
 ]
 
 
+[project.urls]
+Homepage = "https://github.com/BluebonnetField/slidge-style-parser"
+Repository = "https://github.com/BluebonnetField/slidge-style-parser"
+
+
 [tool.maturin]
 features = ["pyo3/extension-module"]
