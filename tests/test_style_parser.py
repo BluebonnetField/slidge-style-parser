@@ -70,3 +70,28 @@ LIMITED_FORMATS = {
 
 def test_limited():
     assert(format_body("_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||", LIMITED_FORMATS) == "<em>underline</em> *bold* <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span>\n>quote\nnothing\nnothing\n>>>>another quote with <span data-mx-spoiler><strike><em>*```four```*</em></strike></span>")
+
+
+CODE_BLOCK_TEST_CASE = \
+"""
+Code test
+```python3
+def who_is_awesome():
+    return "you!"
+```
+Nope
+"""
+
+CODE_BLOCK_TEST_CASE_OUTPUT = \
+"""
+Code test
+<pre><code>
+def who_is_awesome():
+    return \"you!\"
+</code></pre>
+Nope
+"""
+
+
+def test_code():
+    assert (format_body(CODE_BLOCK_TEST_CASE,MATRIX_FORMATS) == CODE_BLOCK_TEST_CASE_OUTPUT)
