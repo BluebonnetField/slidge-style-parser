@@ -154,6 +154,37 @@ fn seek_end(chars: &Vec<char>, keyword: char, start: usize, end: usize) -> Optio
             && !chars[i - 1].is_whitespace()
             && !preceeded_by_backslash(chars, i, start)
         {
+            match seek_higher_order_end(chars, c, i + 1, end) {
+                Some(higher_order_index) => {
+                    return Some(higher_order_index);
+                }
+                None => {
+                    return Some(i);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn seek_higher_order_end(chars: &Vec<char>, keyword: char, start: usize, end: usize) -> Option<usize> {
+    for i in start..=end {
+        let c = chars[i];
+        if c == '\n' {
+            return None;
+        }
+        if c == keyword
+            && chars[i - 1].is_whitespace()
+            && !followed_by_whitespace(chars, i, end)
+            && !preceeded_by_backslash(chars, i, start)
+        {
+            return None; // "*bold* *<--- beginning of new bold>*"
+        }
+        if c == keyword
+            && !chars[i - 1].is_whitespace()
+            && followed_by_whitespace(chars, i, end)
+            && !preceeded_by_backslash(chars, i, start)
+        {
             return Some(i);
         }
     }

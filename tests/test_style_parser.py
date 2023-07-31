@@ -34,8 +34,9 @@ def test_nested():
     assert(format_body("`*~_code span_~*`", MATRIX_FORMATS) == "<code>*~_code span_~*</code>")
     assert(format_body("*_~`code span`~_*", MATRIX_FORMATS) == "<strong><em><strike><code>code span</code></strike></em></strong>")
     assert(format_body(">*_~`code span`~_*", MATRIX_FORMATS) == "<blockquote><strong><em><strike><code>code span</code></strike></em></strong></blockquote>")
-    assert(format_body("*bold*not bold*", MATRIX_FORMATS) == "<strong>bold</strong>not bold*")
+    assert(format_body("*bold star >*< star bold*", MATRIX_FORMATS) == "<strong>bold star >*< star bold</strong>")
     assert(format_body("*_bold*_", MATRIX_FORMATS) == "<strong>_bold</strong>_")
+    assert(format_body("__underlined__", MATRIX_FORMATS) == "<em><em>underlined</em></em>")
 
 def test_no_changes():
     assert(format_body("", MATRIX_FORMATS) == "")
@@ -45,7 +46,6 @@ def test_no_changes():
     assert(format_body("  > no quote", MATRIX_FORMATS) == "  > no quote")
     assert(format_body("_not underlined", MATRIX_FORMATS) == "_not underlined")
     assert(format_body("|not a spoiler|", MATRIX_FORMATS) == "|not a spoiler|")
-    assert(format_body("__not underlined__", MATRIX_FORMATS) == "__not underlined__")
     assert(format_body("`no code\nblock here`", MATRIX_FORMATS) == "`no code\nblock here`")
 
 def test_assorted():
