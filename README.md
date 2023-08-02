@@ -16,7 +16,7 @@ A parsing library for [Slidge](https://sr.ht/~nicoco/slidge). Supports parsing t
 
 code block
 
-```"
+\```"
 
 "\>quote"
 
