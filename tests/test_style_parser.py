@@ -85,26 +85,6 @@ def test_quotes():
     formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote>\nsingle\n<blockquote>double</blockquote></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
-CODE_BLOCK_TEST_CASE = \
-"""
-Code test
-```python3
-def who_is_awesome():
-    return "you!"
-```
-Nope
-"""
-
-CODE_BLOCK_TEST_CASE_OUTPUT = \
-"""
-Code test
-<pre><code>
-def who_is_awesome():
-    return \"you!\"
-</code></pre>
-Nope
-"""
-
 def test_code_blocks():
     test = "```\nhacker\ncode\n```"
     formatted_body = "<pre><code>hacker\ncode</code></pre>"
