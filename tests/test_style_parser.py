@@ -6,67 +6,267 @@ MATRIX_FORMATS = {
     "~": ("<strike>", "</strike>"),
     "`": ("<code>", "</code>"),
     "```": ("<pre><code>", "</code></pre>"),
+    "```language": ("<pre><code class=\"language-{}\">", "</code></pre>"),
     ">": ("<blockquote>", "</blockquote>"),
     "||": ("<span data-mx-spoiler>", "</span>")
 }
 
 def test_basic():
-    assert(format_body("_underline_", MATRIX_FORMATS) == "<em>underline</em>")
-    assert(format_body("*bold*", MATRIX_FORMATS) == "<strong>bold</strong>")
-    assert(format_body("~strikethrough~", MATRIX_FORMATS) == "<strike>strikethrough</strike>")
-    assert(format_body("`code span`", MATRIX_FORMATS) == "<code>code span</code>")
-    assert(format_body("```code\nblock```", MATRIX_FORMATS) == "<pre><code>code\nblock</code></pre>")
-    assert(format_body("||spoiler||", MATRIX_FORMATS) == "<span data-mx-spoiler>spoiler</span>")
+    test = "_underline_"
+    formatted_body = "<em>underline</em>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "*bold*"
+    formatted_body = "<strong>bold</strong>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "~strikethrough~"
+    formatted_body = "<strike>strikethrough</strike>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "`code span`"
+    formatted_body = "<code>code span</code>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = """
+    ```python
+        def test_basic():
+            test = "_underline_"
+            formatted_body = "<em>underline</em>"
+            assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+    ```
+    """
+    formatted_body = test = """
+    <pre><code class="language-python">def test_basic():
+        test = "_underline_"
+        formatted_body = "<em>underline</em>"
+        assert(format_body(test, MATRIX_FORMATS) == (test, formatted_body))</pre></code>
+    """
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "```\ncode block\n```"
+    formatted_body = "<pre><code>code block</code></pre>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "||this message contains a spoiler||"
+    formatted_body = "<span data-mx-spoiler>this message contains a spoiler</span>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_quotes():
-    assert(format_body(">single", MATRIX_FORMATS) == "<blockquote>single</blockquote>")
-    assert(format_body(">single\n>grouped", MATRIX_FORMATS) == "<blockquote>single\ngrouped</blockquote>")
-    assert(format_body(">>double", MATRIX_FORMATS) == "<blockquote><blockquote>double</blockquote></blockquote>")
-    assert(format_body(">>double\n>grouped single", MATRIX_FORMATS) == "<blockquote><blockquote>double</blockquote>\ngrouped single</blockquote>")
-    assert(format_body(">>>tripple\n>single\n>>double", MATRIX_FORMATS) == "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote>\nsingle\n<blockquote>double</blockquote></blockquote>")
+    test = ">single"
+    formatted_body = "<blockquote>single</blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">single arrow ->"
+    formatted_body = "<blockquote>single arrow -></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">single\n>grouped"
+    formatted_body = "<blockquote>single\ngrouped</blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>double"
+    formatted_body = "<blockquote><blockquote>double</blockquote></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>double\n>>double"
+    formatted_body = "<blockquote><blockquote>double\ndouble</blockquote></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>double\n&>not quote"
+    formatted_body = "<blockquote><blockquote>double</blockquote></blockquote>\n&>not quote"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>double\n>grouped single"
+    formatted_body = "<blockquote><blockquote>double</blockquote>\ngrouped single</blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>>tripple\n>single\n>>double"
+    formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote>\nsingle\n<blockquote>double</blockquote></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+CODE_BLOCK_TEST_CASE = \
+"""
+Code test
+```python3
+def who_is_awesome():
+    return "you!"
+```
+Nope
+"""
+
+CODE_BLOCK_TEST_CASE_OUTPUT = \
+"""
+Code test
+<pre><code>
+def who_is_awesome():
+    return \"you!\"
+</code></pre>
+Nope
+"""
+
+def test_code_blocks():
+    test = "```\nhacker\ncode\n```"
+    formatted_body = "<pre><code>hacker\ncode</code></pre>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "```python\nhacker code\n```"
+    formatted_body = "<pre><code class=\"language-python\">hacker code</code></pre>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">```java\n>why are you quoting a code block\n>```"
+    formatted_body = "<blockquote><pre><code class=\"language-java\">why are you quoting a code block</code></pre></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">```\n>please stop trying to break my parser ;-;\n>```"
+    formatted_body = "<blockquote><pre><code>please stop trying to break my parser ;-;</code></pre></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>```\n>>double quote code block\n>single quote not in code block\nnormal text"
+    formatted_body = "<blockquote><blockquote><pre><code>double quote code block</code></pre></blockquote>\nsingle quote not in code block</blockquote>\nnormal text"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>```\n>>>>double quote code block\n>single quote not in code block\nnormal text"
+    formatted_body = "<blockquote><blockquote><pre><code>>>double quote code block</code></pre></blockquote>\nsingle quote not in code block</blockquote>\nnormal text"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "_```_ignored\ninvalid code block\n```"
+    formatted_body = "<em>```</em>ignored\ninvalid code block\n```"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
 
 def test_escaped():
-    assert(format_body("\\_no underline_", MATRIX_FORMATS) == "_no underline_")
-    assert(format_body("\\\\_no underline_", MATRIX_FORMATS) == "\\_no underline_")
-    assert(format_body(">>>tripple\n\\>none\n>>double", MATRIX_FORMATS) == "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote></blockquote>\n>none\n<blockquote><blockquote>double</blockquote></blockquote>")
+    test = "\\_no underline_"
+    formatted_body = "_no underline_"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "\\\\_no underline_"
+    formatted_body = "\\_no underline_"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">>>tripple\n\\>none\n>>double"
+    formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote></blockquote>\n>none\n<blockquote><blockquote>double</blockquote></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_nested():
-    assert(format_body("`*~_code span_~*`", MATRIX_FORMATS) == "<code>*~_code span_~*</code>")
-    assert(format_body("*_~`code span`~_*", MATRIX_FORMATS) == "<strong><em><strike><code>code span</code></strike></em></strong>")
-    assert(format_body(">*_~`code span`~_*", MATRIX_FORMATS) == "<blockquote><strong><em><strike><code>code span</code></strike></em></strong></blockquote>")
-    assert(format_body("*bold star >*< star bold*", MATRIX_FORMATS) == "<strong>bold star >*< star bold</strong>")
-    assert(format_body("*_bold*_", MATRIX_FORMATS) == "<strong>_bold</strong>_")
-    assert(format_body("__underlined__", MATRIX_FORMATS) == "<em><em>underlined</em></em>")
+    test = "`*~_code span_~*`"
+    formatted_body = "<code>*~_code span_~*</code>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "*_~`code span`~_*"
+    formatted_body = "<strong><em><strike><code>code span</code></strike></em></strong>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">*_~`code span`~_*"
+    formatted_body = "<blockquote><strong><em><strike><code>code span</code></strike></em></strong></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "*bold star >*< star bold*"
+    formatted_body = "<strong>bold star >*< star bold</strong>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "*_bold*_"
+    formatted_body = "<strong>_bold</strong>_"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "__underlined__"
+    formatted_body = "<em><em>underlined</em></em>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_no_changes():
-    assert(format_body("", MATRIX_FORMATS) == "")
-    assert(format_body("~~ empty `````` styles **", MATRIX_FORMATS) == "~~ empty `````` styles **")
-    assert(format_body("this is not an empty string", MATRIX_FORMATS) == "this is not an empty string")
-    assert(format_body("arrow ->", MATRIX_FORMATS) == "arrow ->")
-    assert(format_body("  > no quote", MATRIX_FORMATS) == "  > no quote")
-    assert(format_body("_not underlined", MATRIX_FORMATS) == "_not underlined")
-    assert(format_body("|not a spoiler|", MATRIX_FORMATS) == "|not a spoiler|")
-    assert(format_body("`no code\nblock here`", MATRIX_FORMATS) == "`no code\nblock here`")
+    test = ""
+    formatted_body = ""
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "~~ empty `````` styles **"
+    formatted_body = "~~ empty `````` styles **"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "this is not an empty string"
+    formatted_body = "this is not an empty string"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "arrow ->"
+    formatted_body = "arrow ->"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = " > no quote"
+    formatted_body = " > no quote"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "_not underlined"
+    formatted_body = "_not underlined"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "|not a spoiler|"
+    formatted_body = "|not a spoiler|"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "||\nalso\nnot\na\nspoiler||"
+    formatted_body = "||\nalso\nnot\na\nspoiler||"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "`no code\nblock here`"
+    formatted_body = "`no code\nblock here`"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "invalid ```\ncode block\n```"
+    formatted_body = "invalid ```\ncode block\n```"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "```\ncode block\ninvalid```"
+    formatted_body = "```\ncode block\ninvalid```"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "```\ncode block\n```invalid"
+    formatted_body = "```\ncode block\n```invalid"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_assorted():
-    assert(format_body("at the ```end```", MATRIX_FORMATS) == "at the <pre><code>end</code></pre>")
-    assert(format_body("in the ~middle~ here", MATRIX_FORMATS) == "in the <strike>middle</strike> here")
-    assert(format_body("_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||", MATRIX_FORMATS) == "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span>\n<blockquote>quote</blockquote>\nnothing\nnothing\n<blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong><pre><code>four</code></pre></strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>")
+    test = "at the ||end||"
+    formatted_body = "at the <span data-mx-spoiler>end</span>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "in the ~middle~ here"
+    formatted_body = "in the <strike>middle</strike> here"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||"
+    formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span>\n<blockquote>quote</blockquote>\nnothing\nnothing\n<blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_weird_utf8():
-    assert(format_body("❤️💓💕💖💗 ```💙💚💛💜🖤``` 💝💞💟❣️", MATRIX_FORMATS) == "❤️💓💕💖💗 <pre><code>💙💚💛💜🖤</code></pre> 💝💞💟❣️")
-    assert(format_body("👨‍👩‍👧‍👧 _underline_👩‍👩‍👦‍👧", MATRIX_FORMATS) == "👨‍👩‍👧‍👧 <em>underline</em>👩‍👩‍👦‍👧")
-    assert(format_body("\u202eRight to left", MATRIX_FORMATS) == "\u202eRight to left")
-    assert(format_body(">\u202eRight to left quote?", MATRIX_FORMATS) == "<blockquote>\u202eRight to left quote?</blockquote>")
-    assert(format_body("_Invisible\u200bseparator_", MATRIX_FORMATS) == "<em>Invisible\u200bseparator</em>")
-    assert(format_body("~\u200b~", MATRIX_FORMATS) == "<strike>\u200b</strike>")
+    test = "❤️💓💕💖💗 ||💙💚💛💜🖤|| 💝💞💟❣️"
+    formatted_body = "❤️💓💕💖💗 <span data-mx-spoiler>💙💚💛💜🖤</span> 💝💞💟❣️"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "👨‍👩‍👧‍👧 _underline_👩‍👩‍👦‍👧"
+    formatted_body = "👨‍👩‍👧‍👧 <em>underline</em>👩‍👩‍👦‍👧"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "\u202eRight to left"
+    formatted_body = "\u202eRight to left"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">\u202eRight to left quote?"
+    formatted_body = "<blockquote>\u202eRight to left quote?</blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "_Invisible\u200bseparator_"
+    formatted_body = "<em>Invisible\u200bseparator</em>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "~\u200b~"
+    formatted_body = "<strike>\u200b</strike>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 LIMITED_FORMATS = {
     "_": ("<em>", "</em>"),
     "~": ("<strike>", "</strike>"),
-    "`": ("<code>", "</code>"),
-    "||": ("<span data-mx-spoiler>", "</span>")
+    "`": ("<code>", "</code>")
 }
 
 def test_limited():
-    assert(format_body("_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||", LIMITED_FORMATS) == "<em>underline</em> *bold* <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span>\n>quote\nnothing\nnothing\n>>>>another quote with <span data-mx-spoiler><strike><em>*```four```*</em></strike></span>")
+    test = "_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||"
+    formatted_body = "<em>underline</em> *bold* <strike>strikethrough</strike> >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||<strike><em>*```four```*</em></strike>||"
+    assert(format_body(test, LIMITED_FORMATS) == formatted_body)
