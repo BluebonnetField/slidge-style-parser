@@ -8,7 +8,8 @@ MATRIX_FORMATS = {
     "```": ("<pre><code>", "</code></pre>"),
     "```language": ("<pre><code class=\"language-{}\">", "</code></pre>"),
     ">": ("<blockquote>", "</blockquote>"),
-    "||": ("<span data-mx-spoiler>", "</span>")
+    "||": ("<span data-mx-spoiler>", "</span>"),
+    "\n": ("<br>", "")
 }
 
 def test_basic():
@@ -36,12 +37,7 @@ def test_basic():
             assert(format_body(test, MATRIX_FORMATS) == formatted_body)
     ```
     """
-    formatted_body = test = """
-    <pre><code class="language-python">def test_basic():
-        test = "_underline_"
-        formatted_body = "<em>underline</em>"
-        assert(format_body(test, MATRIX_FORMATS) == (test, formatted_body))</pre></code>
-    """
+    formatted_body = test = """<pre><code class="language-python">def test_basic():<br>        test = "_underline_"<br>        formatted_body = "<em>underline</em>"<br>        assert(format_body(test, MATRIX_FORMATS) == (test, formatted_body))</pre></code><br>"""
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "```\ncode block\n```"
@@ -62,7 +58,7 @@ def test_quotes():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">single\n>grouped"
-    formatted_body = "<blockquote>single\ngrouped</blockquote>"
+    formatted_body = "<blockquote>single<br>grouped</blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>double"
@@ -70,24 +66,24 @@ def test_quotes():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>double\n>>double"
-    formatted_body = "<blockquote><blockquote>double\ndouble</blockquote></blockquote>"
+    formatted_body = "<blockquote><blockquote>double<br>double</blockquote></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>double\n&>not quote"
-    formatted_body = "<blockquote><blockquote>double</blockquote></blockquote>\n&>not quote"
+    formatted_body = "<blockquote><blockquote>double</blockquote></blockquote><br>&>not quote"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>double\n>grouped single"
-    formatted_body = "<blockquote><blockquote>double</blockquote>\ngrouped single</blockquote>"
+    formatted_body = "<blockquote><blockquote>double</blockquote><br>grouped single</blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>>tripple\n>single\n>>double"
-    formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote>\nsingle\n<blockquote>double</blockquote></blockquote>"
+    formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote><br>single<br><blockquote>double</blockquote></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_code_blocks():
     test = "```\nhacker\ncode\n```"
-    formatted_body = "<pre><code>hacker\ncode</code></pre>"
+    formatted_body = "<pre><code>hacker<br>code</code></pre>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "```python\nhacker code\n```"
@@ -99,7 +95,7 @@ def test_code_blocks():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>```\n>>double quote code block\n>single quote not in code block\nnormal text"
-    formatted_body = "<blockquote><blockquote><pre><code>double quote code block</code></pre></blockquote>\nsingle quote not in code block</blockquote>\nnormal text"
+    formatted_body = "<blockquote><blockquote><pre><code>double quote code block</code></pre></blockquote><br>single quote not in code block</blockquote><br>normal text"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">```\n>please stop trying to break my parser ;-;"
@@ -107,11 +103,11 @@ def test_code_blocks():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>```\n>>>>double quote code block\n>single quote not in code block\nnormal text"
-    formatted_body = "<blockquote><blockquote><pre><code>>>double quote code block</code></pre></blockquote>\nsingle quote not in code block</blockquote>\nnormal text"
+    formatted_body = "<blockquote><blockquote><pre><code>>>double quote code block</code></pre></blockquote><br>single quote not in code block</blockquote><br>normal text"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "_```_ignored\ninvalid code block\n```"
-    formatted_body = "<em>```</em>ignored\ninvalid code block\n```"
+    formatted_body = "<em>```</em>ignored<br>invalid code block<br>```"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 
@@ -125,7 +121,7 @@ def test_escaped():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>>tripple\n\\>none\n>>double"
-    formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote></blockquote>\n>none\n<blockquote><blockquote>double</blockquote></blockquote>"
+    formatted_body = "<blockquote><blockquote><blockquote>tripple</blockquote></blockquote></blockquote><br>>none<br><blockquote><blockquote>double</blockquote></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_nested():
@@ -183,28 +179,28 @@ def test_no_changes():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "||\nalso\nnot\na\nspoiler||"
-    formatted_body = "||\nalso\nnot\na\nspoiler||"
+    formatted_body = "||<br>also<br>not<br>a<br>spoiler||"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "`no code\nblock here`"
-    formatted_body = "`no code\nblock here`"
+    formatted_body = "`no code<br>block here`"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "invalid ```\ncode block\n```"
-    formatted_body = "invalid ```\ncode block\n```"
+    formatted_body = "invalid ```<br>code block<br>```"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "```\ncode block\ninvalid```"
-    formatted_body = "```\ncode block\ninvalid```"
+    formatted_body = "```<br>code block<br>invalid```"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "```\ncode block\n```invalid"
-    formatted_body = "```\ncode block\n```invalid"
+    formatted_body = "```<br>code block<br>```invalid"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_assorted():
     test = "\n"
-    formatted_body = "\n"
+    formatted_body = "<br>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "at the ||end||"
@@ -216,23 +212,27 @@ def test_assorted():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||"
-    formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span>\n<blockquote>quote</blockquote>\nnothing\nnothing\n<blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
+    formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span><br><blockquote>quote</blockquote><br>nothing<br>nothing<br><blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">```\n>do be do be dooo ba do be do be do ba\n>>>"
-    formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba\n>></code></pre></blockquote>"
+    formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba<br>>></code></pre></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "\n\n>```\n>do be do be dooo ba do be do be do ba\na\n\n\naoeu\n"
-    formatted_body = "\n\n<blockquote><pre><code>do be do be dooo ba do be do be do ba</code></pre></blockquote>\na\n\n\naoeu\n"
+    formatted_body = "<br><br><blockquote><pre><code>do be do be dooo ba do be do be do ba</code></pre></blockquote><br>a<br><br><br>aoeu<br>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">```\n>do be do be dooo ba do be do be do ba\n>\n>\n>aoeu"
-    formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba\n\n\naoeu</code></pre></blockquote>"
+    formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba<br><br><br>aoeu</code></pre></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
-    test = ">```\n>code block\n>```invalid\n"
-    formatted_body = "<blockquote><pre><code>code block\n```invalid</code></pre></blockquote>\n"
+    test = ">```\n>code block\n>```invalid end\n"
+    formatted_body = "<blockquote><pre><code>code block<br>```invalid end</code></pre></blockquote><br>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "invalid ```\ncode block\n*bold*\n```"
+    formatted_body = "invalid ```<br>code block<br><strong>bold</strong><br>```"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_weird_utf8():

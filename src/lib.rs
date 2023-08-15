@@ -42,7 +42,13 @@ fn format_body(body: String, new_tags: HashMap<String, (String, String)>) -> PyR
         chars = [chars[..index].to_vec(), tag.chars().collect(), chars[end..].to_vec()].concat();
     }
 
-    Ok(remove_non_escaped_backslashes(chars.into_iter().collect()))
+    let text: String = if new_tags.contains_key("\n") {
+        chars.into_iter().collect::<String>().replace("\n", &new_tags.get(&"\n".to_string()).unwrap().0)
+    } else {
+        chars.into_iter().collect::<String>()
+    };
+
+    Ok(remove_non_escaped_backslashes(text))
 }
 
 fn remove_non_escaped_backslashes(text: String) -> String {
@@ -100,9 +106,8 @@ fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usize) 
                         };
                         styles.push((keyword, index, end_of_line + 1, to, remove_end));
                         styles.append(&mut parse_quotes_in_code_block(chars, index + 3, to, depth));
+                        index = to;
                     }
-                    index = to + 3;
-                    continue;
                 }
                 None => ()
             }
