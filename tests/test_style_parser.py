@@ -98,12 +98,12 @@ def test_code_blocks():
     formatted_body = "<blockquote><pre><code class=\"language-java\">why are you quoting a code block</code></pre></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
-    test = ">```\n>please stop trying to break my parser ;-;\n>```"
-    formatted_body = "<blockquote><pre><code>please stop trying to break my parser ;-;</code></pre></blockquote>"
-    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
-
     test = ">>```\n>>double quote code block\n>single quote not in code block\nnormal text"
     formatted_body = "<blockquote><blockquote><pre><code>double quote code block</code></pre></blockquote>\nsingle quote not in code block</blockquote>\nnormal text"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">```\n>please stop trying to break my parser ;-;"
+    formatted_body = "<blockquote><pre><code>please stop trying to break my parser ;-;</code></pre></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = ">>```\n>>>>double quote code block\n>single quote not in code block\nnormal text"
@@ -203,6 +203,10 @@ def test_no_changes():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_assorted():
+    test = "\n"
+    formatted_body = "\n"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
     test = "at the ||end||"
     formatted_body = "at the <span data-mx-spoiler>end</span>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
@@ -213,6 +217,22 @@ def test_assorted():
 
     test = "_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||"
     formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span>\n<blockquote>quote</blockquote>\nnothing\nnothing\n<blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">```\n>do be do be dooo ba do be do be do ba\n>>>"
+    formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba\n>></code></pre></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "\n\n>```\n>do be do be dooo ba do be do be do ba\na\n\n\naoeu\n"
+    formatted_body = "\n\n<blockquote><pre><code>do be do be dooo ba do be do be do ba</code></pre></blockquote>\na\n\n\naoeu\n"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">```\n>do be do be dooo ba do be do be do ba\n>\n>\n>aoeu"
+    formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba\n\n\naoeu</code></pre></blockquote>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = ">```\n>code block\n>```invalid\n"
+    formatted_body = "<blockquote><pre><code>code block\n```invalid</code></pre></blockquote>\n"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
 def test_weird_utf8():

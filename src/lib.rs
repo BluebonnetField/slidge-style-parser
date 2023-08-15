@@ -86,13 +86,14 @@ fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usize) 
             }
             match seek_end_block(chars, c, end_of_line, end, depth) {
                 Some(to) => {
+                    println!("to {}", to);
                     if to != index + 3 && is_quote_start(chars, index, depth) {
                         let keyword = if end_of_line == index + 3 {
                             "```".to_string()
                         } else {
                             "```language".to_string()
                         };
-                        let remove_end = if depth > 0 && to == end {
+                        let remove_end = if depth > 0 && (to == end || to == chars.len()) {
                             to
                         } else {
                             to + 4 + depth
@@ -242,7 +243,6 @@ fn seek_higher_order_end(chars: &Vec<char>, keyword: char, start: usize, repetit
         if c == keyword
             && chars[i - 1].is_whitespace()
             && !followed_by_whitespace(chars, i, end)
-            && !preceeded_by_backslash(chars, i, start)
             && is_char_repeating(chars, keyword, repetitions, i + 1, end)
         {
             return None; // "*bold* *<--- beginning of new bold>*"
@@ -283,17 +283,27 @@ fn seek_end_of_quote(chars: &Vec<char>, start: usize, end: usize, depth: usize) 
 
 fn seek_end_block(chars: &Vec<char>, keyword: char, start: usize, end: usize, depth: usize) -> Option<usize> {
     for i in start..=end {
-        if chars[i] == '\n'
-            && i + 4 + depth > end
-            && (depth == 0 || chars[i + 1..i + 1 + depth].iter().all(|&c| QUOTE_KEYWORDS.contains(&c)))
-            && chars[i + 1 + depth] == keyword
-            && is_char_repeating(chars, keyword, 2, i + 1 + depth, end)
-        {
-            return Some(i);
+        if chars[i] == '\n' {
+            if i + depth == end && chars[i + 1..i + 1 + depth].iter().all(|&c| QUOTE_KEYWORDS.contains(&c)) {
+                continue;
+            }
+            if i + 1 + depth > end {
+                return Some(i);
+            }
+            if i + 4 + depth > end
+                && chars[i + 1..i + 1 + depth].iter().all(|&c| QUOTE_KEYWORDS.contains(&c))
+                && chars[i + 1 + depth] == keyword
+                && is_char_repeating(chars, keyword, 2, i + 1 + depth, end)
+            {
+                return Some(i);
+            }
         }
     }
     if end == chars.len() - 1 {
-        return None;
+        if depth == 0 {
+            return None;
+        }
+        return Some(chars.len());
     }
     Some(end)
 }
