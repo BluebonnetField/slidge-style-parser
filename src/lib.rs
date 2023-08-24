@@ -295,7 +295,7 @@ fn seek_end_block(chars: &Vec<char>, keyword: char, start: usize, end: usize, de
             if i + 1 + depth > end {
                 return Some(i);
             }
-            if i + 4 + depth > end
+            if seek_end_of_line(chars, i + 1, end) == i + depth + 4
                 && chars[i + 1..i + 1 + depth].iter().all(|&c| QUOTE_KEYWORDS.contains(&c))
                 && chars[i + 1 + depth] == keyword
                 && is_char_repeating(chars, keyword, 2, i + 1 + depth, end)

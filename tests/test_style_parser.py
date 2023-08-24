@@ -90,6 +90,10 @@ def test_code_blocks():
     formatted_body = "<pre><code class=\"language-python\">hacker code</code></pre>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
+    test = "```python\nhacker code\n```\nnormal text"
+    formatted_body = "<pre><code class=\"language-python\">hacker code</code></pre><br>normal text"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
     test = ">```java\n>why are you quoting a code block\n>```"
     formatted_body = "<blockquote><pre><code class=\"language-java\">why are you quoting a code block</code></pre></blockquote>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
