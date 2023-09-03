@@ -8,12 +8,13 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
     let end = end.min(chars.len() - 1);
 
     while index <= end {
-        if preceeded_by_backslash(chars, index, start) {
-            index += 1;
+        let c = chars[index];
+        if c == '\\' {
+            styles.push(("\\".to_string(), index, index + 1, index + 1, index + 1));
+            index += 2;
             continue;
         }
 
-        let c = chars[index];
         if QUOTE_KEYWORDS.contains(&c) {
             if is_quote_start(chars, index, depth) {
                 let to = seek_end_of_quote(chars, index, end, depth);
@@ -168,7 +169,6 @@ fn seek_end(chars: &Vec<char>, keyword: char, start: usize, repetitions: usize, 
         }
         if c == keyword
             && !chars[i - 1].is_whitespace()
-            && !preceeded_by_backslash(chars, i, start)
             && is_char_repeating(chars, keyword, repetitions, i + 1, end)
         {
             match seek_higher_order_end(chars, c, i + 1, repetitions, end) {
@@ -200,7 +200,6 @@ fn seek_higher_order_end(chars: &Vec<char>, keyword: char, start: usize, repetit
         if c == keyword
             && !chars[i - 1].is_whitespace()
             && followed_by_whitespace(chars, i, end)
-            && !preceeded_by_backslash(chars, i, start)
             && is_char_repeating(chars, keyword, repetitions, i + 1, end)
         {
             return Some(i);
@@ -260,15 +259,4 @@ fn seek_end_block(chars: &Vec<char>, keyword: char, start: usize, end: usize, de
 
 fn is_quote_start(chars: &Vec<char>, index: usize, depth: usize) -> bool {
     index - depth == 0 || chars[index - 1 - depth] == '\n'
-}
-
-fn preceeded_by_backslash(chars: &Vec<char>, index: usize, start: usize) -> bool {
-    if index == start {
-        return false;
-    }
-    let mut num_backslashes = 0;
-    while index > num_backslashes && chars[index - 1 - num_backslashes] == '\\' {
-        num_backslashes += 1;
-    }
-    num_backslashes % 2 == 1
 }

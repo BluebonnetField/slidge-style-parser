@@ -4,8 +4,6 @@ use pyo3::prelude::*;
 
 use crate::parser::parse_with_limits;
 
-const PLACEHOLDER: &str = "\u{200B}\u{200B}\u{200B}\u{200B}\u{200B}\u{200B}\u{200B}\u{200B}\u{200B}\u{200B}";
-
 #[pyfunction]
 pub fn format_body(body: String, new_tags: HashMap<String, (String, String)>) -> PyResult<String> {
     let mut chars: Vec<char> = body.chars().collect();
@@ -28,7 +26,7 @@ pub fn format_body(body: String, new_tags: HashMap<String, (String, String)>) ->
             };
             tags.push((start, opening_tag, remove_start));
             tags.push((end, new_tags.get(&keyword).unwrap().1.clone(), remove_end));
-        } else if (keyword == ">>" && parse_quotes) || keyword == "```>" {
+        } else if (keyword == ">>" && parse_quotes) || keyword == "```>" || keyword == "\\" {
             tags.push((start, "".to_string(), start+1));
         }
     }
@@ -45,11 +43,5 @@ pub fn format_body(body: String, new_tags: HashMap<String, (String, String)>) ->
         chars.into_iter().collect::<String>()
     };
 
-    Ok(remove_non_escaped_backslashes(text))
-}
-
-fn remove_non_escaped_backslashes(text: String) -> String {
-    let tmp_string = text.replace("\\\\", PLACEHOLDER);
-    let tmp_string = tmp_string.replace("\\", "");
-    tmp_string.replace(PLACEHOLDER, "\\")
+    Ok(text)
 }

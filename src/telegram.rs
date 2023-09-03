@@ -10,6 +10,7 @@ const TELEGRAM_STYLES: &[(&'static str, &'static str)] = &[
     ("~", "strikethrough"),
     ("||", "spoiler"),
     ("`", "code"),
+    ("```language", "pre"),
     ("```", "pre")
 ];
 
@@ -26,7 +27,7 @@ pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize,
         if TELEGRAM_STYLES.iter().any(|&(k, _)| k == keyword) {
             remove_tags.push((*start, *remove_start));
             remove_tags.push((*end, *remove_end));
-        } else if keyword == "```>" {
+        } else if keyword == "```>" || keyword == "\\" {
             remove_tags.push((*start, *remove_start));
         }
     }
@@ -52,7 +53,7 @@ pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize,
             let last_index = all_indexes.len() - 1;
             message_entities.push((true, last_index, TELEGRAM_STYLES.iter().find(|&&(k, _)| k == keyword).unwrap().1.to_string(), *start, language));
             message_entities.push((false, last_index, "".to_string(), *end, "".to_string()));
-        } else if keyword == "```>" {
+        } else if keyword == "```>" || keyword == "\\" {
             all_indexes.push(vec![0, 0, *start, 1]);
             message_entities.push((false, all_indexes.len() - 1, "".to_string(), *start, "".to_string()));
         }
