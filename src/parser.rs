@@ -38,7 +38,6 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
             }
             match seek_end_block(chars, c, end_of_line, end, depth) {
                 Some(to) => {
-                    println!("to {}", to);
                     if to != index + 3 && is_quote_start(chars, index, depth) {
                         let keyword = if end_of_line == index + 3 {
                             "```".to_string()

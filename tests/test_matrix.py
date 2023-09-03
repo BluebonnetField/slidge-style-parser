@@ -30,14 +30,14 @@ def test_basic():
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = """
-    ```python
-        def test_basic():
-            test = "_underline_"
-            formatted_body = "<em>underline</em>"
-            assert(format_body(test, MATRIX_FORMATS) == formatted_body)
-    ```
-    """
-    formatted_body = test = """<pre><code class="language-python">def test_basic():<br>        test = "_underline_"<br>        formatted_body = "<em>underline</em>"<br>        assert(format_body(test, MATRIX_FORMATS) == (test, formatted_body))</pre></code><br>"""
+```python
+    def test_basic():
+        test = "_underline_"
+        formatted_body = "<em>underline</em>"
+        assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+```
+"""
+    formatted_body = '<br><pre><code class="language-python">    def test_basic():<br>        test = "_underline_"<br>        formatted_body = "<em>underline</em>"<br>        assert(format_body(test, MATRIX_FORMATS) == formatted_body)</code></pre><br>'
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "```\ncode block\n```"
@@ -88,6 +88,10 @@ def test_code_blocks():
 
     test = "```python\nhacker code\n```"
     formatted_body = "<pre><code class=\"language-python\">hacker code</code></pre>"
+    assert(format_body(test, MATRIX_FORMATS) == formatted_body)
+
+    test = "```pythonaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nhacker code\n```"
+    formatted_body = "<pre><code class=\"language-pythonaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\">hacker code</code></pre>"
     assert(format_body(test, MATRIX_FORMATS) == formatted_body)
 
     test = "```python\nhacker code\n```\nnormal text"

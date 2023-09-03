@@ -32,12 +32,7 @@ pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize,
         }
     }
 
-    remove_tags.sort_by(|a, b| b.0.cmp(&a.0));
-
-    for (index, end) in remove_tags {
-        chars = [chars[..index].to_vec(), chars[end..].to_vec()].concat();
-    }
-
+    // is_start (*<--- start, end -->*), index of all_indexes, format, index of tag, language of codeblock
     let mut message_entities: Vec<(bool, usize, String, usize, String)> = Vec::with_capacity(styles.len() * 2);
     let mut all_indexes: Vec<Vec<usize>> = Vec::with_capacity(styles.len());
     for (keyword, start, remove_start, end, remove_end) in &styles {
@@ -49,7 +44,7 @@ pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize,
             } else {
                 "".to_string()
             };
-            all_indexes.push(vec![*start, *remove_start, *end, *remove_end]);
+            all_indexes.push(vec![*start, *remove_start - *start, *end, *remove_end - *end]);
             let last_index = all_indexes.len() - 1;
             message_entities.push((true, last_index, TELEGRAM_STYLES.iter().find(|&&(k, _)| k == keyword).unwrap().1.to_string(), *start, language));
             message_entities.push((false, last_index, "".to_string(), *end, "".to_string()));
@@ -59,6 +54,12 @@ pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize,
         }
     }
     message_entities.sort_by(sort_message_entities);
+
+    remove_tags.sort_by(|a, b| b.0.cmp(&a.0));
+
+    for (index, end) in remove_tags {
+        chars = [chars[..index].to_vec(), chars[end..].to_vec()].concat();
+    }
 
     let formatted_text = chars.into_iter().collect::<String>();
     let utf16_lengths: Vec<usize> = utf8_to_utf16_length(&formatted_text);
@@ -78,7 +79,7 @@ pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize,
         formatted_text,
         message_entities.into_iter()
             .filter(|(is_start, _, _, _, _)| { *is_start } )
-            .map(|(_, index, format, _, language)| { (format, utf16_lengths[all_indexes[index][0]], utf16_lengths[all_indexes[index][2]], language) })
+            .map(|(_, index, format, _, language)| { (format, utf16_lengths[all_indexes[index][0]], utf16_lengths[all_indexes[index][2] - 1] - utf16_lengths[all_indexes[index][0]], language) })
             .collect()
     ))
 }
