@@ -46,7 +46,7 @@ pub fn format_for_matrix(body: String) -> PyResult<String> {
         if tag == "</code></pre>" {
             // index is at \n, add 1 to skip that one
             let substring = chars[index + 1..replace_newlines_to].into_iter().collect::<String>();
-            chars = [&chars[..index + 1], &substring.replace('\n', "<br>").chars().collect::<Vec<char>>()[..]].concat();
+            chars = [&chars[..index + 1], &substring.replace('\n', "<br>").chars().collect::<Vec<char>>()[..], &chars[replace_newlines_to..]].concat();
         } else if tag == "<pre><code>" {
             replace_newlines_to = index;
         }
@@ -60,6 +60,7 @@ pub fn format_for_matrix(body: String) -> PyResult<String> {
         } else {
             replace_newlines_to - offset.abs() as usize
         };
+        println!("chars {:?}", chars.clone().into_iter().collect::<String>());
     }
     let substring = chars[..replace_newlines_to].into_iter().collect::<String>();
     let text = [substring.replace('\n', "<br>"), chars[replace_newlines_to..].into_iter().collect::<String>()].concat();

@@ -227,6 +227,10 @@ def test_assorted():
     formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span><br><blockquote>quote</blockquote><br>nothing<br>nothing<br><blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
     assert(format_for_matrix(test) == formatted_body)
 
+    test = "```\nhacker\ncode\n```\n\n```\nhacker\ncode\n```"
+    formatted_body = "<pre><code>hacker\ncode</code></pre><br><br><pre><code>hacker\ncode</code></pre>"
+    assert(format_for_matrix(test) == formatted_body)
+
     test = ">```\n>do be do be dooo ba do be do be do ba\n>>>"
     formatted_body = "<blockquote><pre><code>do be do be dooo ba do be do be do ba\n>></code></pre></blockquote>"
     assert(format_for_matrix(test) == formatted_body)
