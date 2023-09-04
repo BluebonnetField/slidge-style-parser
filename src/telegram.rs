@@ -15,7 +15,7 @@ const TELEGRAM_STYLES: &[(&'static str, &'static str)] = &[
 ];
 
 #[pyfunction]
-pub fn parse_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize, usize, String)>)> {
+pub fn format_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize, usize, String)>)> {
     let mut chars: Vec<char> = body.chars().collect();
     if chars.len() < 1 {
         return Ok((body, Vec::with_capacity(0)));
