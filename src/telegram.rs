@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use pyo3::prelude::*;
 
 use crate::parser::parse_with_limits;
@@ -32,7 +30,7 @@ pub fn format_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize
         }
     }
 
-    // is_start (*<--- start, end -->*), index of all_indexes, format, index of tag, language of codeblock
+    // is_start (*<-- start, end -->*), index of all_indexes, format, index of tag, language of codeblock
     let mut message_entities: Vec<(bool, usize, String, usize, String)> = Vec::with_capacity(styles.len() * 2);
     let mut all_indexes: Vec<Vec<usize>> = Vec::with_capacity(styles.len());
     for (keyword, start, remove_start, end, remove_end) in &styles {
@@ -53,7 +51,7 @@ pub fn format_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize
             message_entities.push((false, all_indexes.len() - 1, "".to_string(), *start, "".to_string()));
         }
     }
-    message_entities.sort_by(sort_message_entities);
+    message_entities.sort_by(|a, b| a.3.cmp(&b.3));
 
     remove_tags.sort_by(|a, b| b.0.cmp(&a.0));
 
@@ -79,24 +77,21 @@ pub fn format_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize
         formatted_text,
         message_entities.into_iter()
             .filter(|(is_start, _, _, _, _)| { *is_start } )
-            .map(|(_, index, format, _, language)| { (format, utf16_lengths[all_indexes[index][0]], utf16_lengths[all_indexes[index][2] - 1] - utf16_lengths[all_indexes[index][0]], language) })
+            .map(|(_, index, format, _, language)| { (format, utf16_lengths[all_indexes[index][0]], utf16_lengths[all_indexes[index][2]] - utf16_lengths[all_indexes[index][0]], language) })
             .collect()
     ))
-}
-
-fn sort_message_entities(first: &(bool, usize, String, usize, String), second: &(bool, usize, String, usize, String)) -> Ordering {
-    return first.3.cmp(&second.3);
 }
 
 fn utf8_to_utf16_length(utf8_str: &str) -> Vec<usize> {
     let mut utf16_lengths = Vec::with_capacity(utf8_str.len());
 
     let mut length = 0;
+    utf16_lengths.push(0);
     for byte in utf8_str.as_bytes() {
         if (byte & 0xc0) != 0x80 {
             length += if *byte >= 0xf0 { 2 } else { 1 };
+            utf16_lengths.push(length);
         }
-        utf16_lengths.push(length);
     }
     utf16_lengths
 }

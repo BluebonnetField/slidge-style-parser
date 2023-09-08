@@ -3,22 +3,22 @@ from slidge_style_parser import format_for_telegram
 def test_basic():
     test = "_underline_"
     formatted_body = "underline"
-    styles = [('italics', 1, 8, '')]
+    styles = [('italics', 0, 9, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
     test = "*bold*"
     formatted_body = "bold"
-    styles = [('bold', 1, 3, '')]
+    styles = [('bold', 0, 4, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
     test = "~strikethrough~"
     formatted_body = "strikethrough"
-    styles = [('strikethrough', 1, 12, '')]
+    styles = [('strikethrough', 0, 13, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
     test = "`code span`"
     formatted_body = "code span"
-    styles = [('code', 1, 8, '')]
+    styles = [('code', 0, 9, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
     test = """
@@ -30,17 +30,22 @@ def test_basic():
 ```
 """
     formatted_body = '\n    def test_basic():\n        test = "_underline_"\n        formatted_body = "underline"\n        assert(format_for_telegram(test)[0] == formatted_body)\n'
-    styles = [('pre', 2, 149, 'python')]
+    styles = [('pre', 1, 150, 'python')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
     test = "```\ncode block\n```"
     formatted_body = "code block"
-    styles = [('pre', 1, 9, '')]
+    styles = [('pre', 0, 10, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
     test = "||this message contains a spoiler||"
     formatted_body = "this message contains a spoiler"
-    styles = [('spoiler', 1, 30, '')]
+    styles = [('spoiler', 0, 31, '')]
+    assert(format_for_telegram(test) == (formatted_body, styles))
+
+    test = "❤️💓💕💖💗 ||💙💚💛💜🖤|| 💝💞💟❣️"
+    formatted_body = "❤️💓💕💖💗 💙💚💛💜🖤 💝💞💟❣️"
+    styles = [('spoiler', 11, 10, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
 def test_quotes():

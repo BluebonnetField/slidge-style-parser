@@ -60,7 +60,6 @@ pub fn format_for_matrix(body: String) -> PyResult<String> {
         } else {
             replace_newlines_to - offset.abs() as usize
         };
-        println!("chars {:?}", chars.clone().into_iter().collect::<String>());
     }
     let substring = chars[..replace_newlines_to].into_iter().collect::<String>();
     let text = [substring.replace('\n', "<br>"), chars[replace_newlines_to..].into_iter().collect::<String>()].concat();
