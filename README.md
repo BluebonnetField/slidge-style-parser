@@ -54,5 +54,8 @@ new_tags = {
     "||": ("<span data-mx-spoiler>", "</span>"),
     
     "\n": ("<br>", "")
-
+    
 }
+
+License: AGPL-3.0-or-late
+
