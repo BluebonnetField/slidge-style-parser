@@ -38,7 +38,7 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
             }
             match seek_end_block(chars, c, end_of_line, end, depth) {
                 Some(to) => {
-                    if to != index + 3 && is_quote_start(chars, index, depth) {
+                    if to != end_of_line && is_quote_start(chars, index, depth) {
                         let keyword = if end_of_line == index + 3 {
                             "```".to_string()
                         } else {
@@ -170,7 +170,7 @@ fn seek_end(chars: &Vec<char>, keyword: char, start: usize, repetitions: usize, 
             && !chars[i - 1].is_whitespace()
             && is_char_repeating(chars, keyword, repetitions, i + 1, end)
         {
-            match seek_higher_order_end(chars, c, i + 1, repetitions, end) {
+            match seek_higher_order_end(chars, c, i + 1, end) {
                 Some(higher_order_i) => {
                     return Some(higher_order_i);
                 }
@@ -183,24 +183,21 @@ fn seek_end(chars: &Vec<char>, keyword: char, start: usize, repetitions: usize, 
     None
 }
 
-fn seek_higher_order_end(chars: &Vec<char>, keyword: char, start: usize, repetitions: usize, end: usize) -> Option<usize> {
+fn seek_higher_order_end(chars: &Vec<char>, keyword: char, start: usize, end: usize) -> Option<usize> {
+    let mut skip = true;
     for i in start..=end {
         let c = chars[i];
         if c == '\n' {
             return None;
         }
-        if c == keyword
-            && chars[i - 1].is_whitespace()
-            && !followed_by_whitespace(chars, i, end)
-            && is_char_repeating(chars, keyword, repetitions, i + 1, end)
-        {
+        if c != keyword {
+            skip = false;
+            continue;
+        }
+        if chars[i - 1].is_whitespace() && !followed_by_whitespace(chars, i, end) {
             return None; // "*bold* *<--- beginning of new bold>*"
         }
-        if c == keyword
-            && !chars[i - 1].is_whitespace()
-            && followed_by_whitespace(chars, i, end)
-            && is_char_repeating(chars, keyword, repetitions, i + 1, end)
-        {
+        if followed_by_whitespace(chars, i, end) && !skip {
             return Some(i);
         }
     }

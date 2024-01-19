@@ -48,6 +48,23 @@ def test_basic():
     formatted_body = "<span data-mx-spoiler>this message contains a spoiler</span>"
     assert(format_for_matrix(test) == formatted_body)
 
+def test_empty():
+    test = "__ ** ~~ ``"
+    formatted_body = "__ ** ~~ ``"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "```\n```"
+    formatted_body = "```<br>```"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "```python\n```"
+    formatted_body = "```python<br>```"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "_____"
+    formatted_body = "_____"
+    assert(format_for_matrix(test) == formatted_body)
+
 def test_quotes():
     test = ">single"
     formatted_body = "<blockquote>single</blockquote>"
