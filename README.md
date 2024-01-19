@@ -2,6 +2,8 @@
 
 [PyPi](https://pypi.org/project/slidge-style-parser/)
 
+License: AGPL-3.0-or-later
+
 A parsing library for [Slidge](https://sr.ht/~nicoco/slidge). Supports parsing these attributes:
 
 "\_underline_"
@@ -56,3 +58,5 @@ new_tags = {
     "\n": ("<br>", "")
 
 }
+
+To build: `maturin build`
