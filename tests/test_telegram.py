@@ -48,6 +48,17 @@ def test_basic():
     styles = [('spoiler', 11, 10, '')]
     assert(format_for_telegram(test) == (formatted_body, styles))
 
+def test_basic_mention():
+    test = "SavagePeanut _underline_"
+    formatted_body = "SavagePeanut underline"
+    styles = [('mention', 0, 12, ''), ('italics', 13, 9, '')]
+    assert(format_for_telegram(test, [("SavagePeanut", 0, 12)]) == (formatted_body, styles))
+
+    test = "*bold* SavagePeanut"
+    formatted_body = "bold SavagePeanut"
+    styles = [('bold', 0, 4, ''), ('mention', 5, 12, '')]
+    assert(format_for_telegram(test, [("SavagePeanut", 7, 19)]) == (formatted_body, styles))
+
 def test_quotes():
     test = ">single"
     formatted_body = ">single"

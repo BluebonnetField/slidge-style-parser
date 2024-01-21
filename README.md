@@ -31,9 +31,10 @@ Most of them correspond to [XEP-0393: Message Styling](https://xmpp.org/extensio
 Methods: 
 
 
-format_for_telegram(body: String) -> (body: String, Vec<(format: String, offset: usize, length: usize, language: String)>)
+format_for_telegram(body: String, mentions: Optional<(_, start, end_index_exclusive)>)
+    -> (body: String, Vec<(format: String, offset: usize, length: usize, language: String)>)
 
-format_for_matrix(body: String) -> body: String
+format_for_matrix(body: String, mentions: Optional<(mxid, start, end_index_exclusive)>) -> body: String
 
 format_body(body: String, new_tags: HashMap<String, (String, String)>) -> String
 

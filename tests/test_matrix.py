@@ -48,6 +48,15 @@ def test_basic():
     formatted_body = "<span data-mx-spoiler>this message contains a spoiler</span>"
     assert(format_for_matrix(test) == formatted_body)
 
+def test_basic_mention():
+    test = "SavagePeanut _underline_"
+    formatted_body = "<a href='https://matrix.to/#/@SavagePeanut:example.org'>SavagePeanut</a> <em>underline</em>"
+    assert(format_for_matrix(test, [("@SavagePeanut:example.org", 0, 12)]) == formatted_body)
+
+    test = "*bold* SavagePeanut"
+    formatted_body = "<strong>bold</strong> <a href='https://matrix.to/#/@SavagePeanut:example.org'>SavagePeanut</a>"
+    assert(format_for_matrix(test, [("@SavagePeanut:example.org", 7, 19)]) == formatted_body)
+
 def test_empty():
     test = "__ ** ~~ ``"
     formatted_body = "__ ** ~~ ``"

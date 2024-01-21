@@ -13,11 +13,12 @@ const TELEGRAM_STYLES: &[(&'static str, &'static str)] = &[
 ];
 
 #[pyfunction]
-pub fn format_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize, usize, String)>)> {
+pub fn format_for_telegram(body: String, mentions: Option<Vec<(String, usize, usize)>>) -> PyResult<(String, Vec<(String, usize, usize, String)>)> {
     let mut chars: Vec<char> = body.chars().collect();
     if chars.len() < 1 {
         return Ok((body, Vec::with_capacity(0)));
     }
+    let mentions = mentions.unwrap_or(Vec::with_capacity(0));
 
     let styles: Vec<(String, usize, usize, usize, usize)> = parse_with_limits(&chars, 0, chars.len() - 1, 0);
     let mut remove_tags: Vec<(usize, usize)> = Vec::with_capacity(styles.len() * 2);
@@ -40,16 +41,22 @@ pub fn format_for_telegram(body: String) -> PyResult<(String, Vec<(String, usize
                 .into_iter()
                 .collect::<String>()
             } else {
-                "".to_string()
+                String::new()
             };
             all_indexes.push(vec![*start, *remove_start - *start, *end, *remove_end - *end]);
             let last_index = all_indexes.len() - 1;
-            message_entities.push((true, last_index, TELEGRAM_STYLES.iter().find(|&&(k, _)| k == keyword).unwrap().1.to_string(), *start, language));
-            message_entities.push((false, last_index, "".to_string(), *end, "".to_string()));
+            message_entities.push((true, last_index, TELEGRAM_STYLES.iter().find(|&&(k, _)| k == keyword).unwrap().1.to_owned(), *start, language));
+            message_entities.push((false, last_index, String::new(), *end, String::new()));
         } else if keyword == "```>" || keyword == "\\" {
             all_indexes.push(vec![0, 0, *start, 1]);
-            message_entities.push((false, all_indexes.len() - 1, "".to_string(), *start, "".to_string()));
+            message_entities.push((false, all_indexes.len() - 1, String::new(), *start, String::new()));
         }
+    }
+    for (_name, start, end) in mentions {
+        all_indexes.push(vec![start, 0, end, 0]);
+        let last_index = all_indexes.len() - 1;
+        message_entities.push((true, last_index, "mention".to_owned(), start, String::new()));
+        message_entities.push((false, last_index, String::new(), end, String::new()));
     }
     message_entities.sort_by(|a, b| a.3.cmp(&b.3));
 

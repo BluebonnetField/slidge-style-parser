@@ -10,7 +10,7 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
     while index <= end {
         let c = chars[index];
         if c == '\\' {
-            styles.push(("\\".to_string(), index, index + 1, index + 1, index + 1));
+            styles.push(("\\".to_owned(), index, index + 1, index + 1, index + 1));
             index += 2;
             continue;
         }
@@ -18,13 +18,13 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
         if QUOTE_KEYWORDS.contains(&c) {
             if is_quote_start(chars, index, depth) {
                 let to = seek_end_of_quote(chars, index, end, depth);
-                styles.push((">".to_string(), index, index + 1, to, to));
+                styles.push((">".to_owned(), index, index + 1, to, to));
                 styles.append(&mut parse_with_limits(chars, index + 1, to, depth + 1));
                 index = to;
                 continue;
             }
             if is_nested_quote(chars, index, depth) {
-                styles.push((">>".to_string(), index, index + 1, index + 1, index + 1));
+                styles.push((">>".to_owned(), index, index + 1, index + 1, index + 1));
             }
             index += 1;
             continue;
@@ -40,9 +40,9 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
                 Some(to) => {
                     if to != end_of_line && is_quote_start(chars, index, depth) {
                         let keyword = if end_of_line == index + 3 {
-                            "```".to_string()
+                            "```".to_owned()
                         } else {
-                            "```language".to_string()
+                            "```language".to_owned()
                         };
                         let remove_end = if depth > 0 && (to == end || to == chars.len()) {
                             to
@@ -69,7 +69,7 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
             match seek_end(chars, c, index + 2, 1, end) {
                 Some(to) => {
                     if to != index + 2 {
-                        let keyword = "||".to_string();
+                        let keyword = "||".to_owned();
                         styles.push((keyword, index, index + 2, to, to + 2));
                         styles.append(&mut parse_with_limits(chars, index + 2, to - 1, depth));
                     }
@@ -117,7 +117,7 @@ fn parse_quotes_in_code_block(chars: &Vec<char>, start: usize, end: usize, depth
         let c = chars[index];
         if QUOTE_KEYWORDS.contains(&c) {
             if is_nested_quote(chars, index, depth) {
-                quotes.push(("```>".to_string(), index, index + 1, index + 1, index + 1));
+                quotes.push(("```>".to_owned(), index, index + 1, index + 1, index + 1));
             }
             index += 1;
             continue;
