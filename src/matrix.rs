@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 
 use crate::parser::parse_with_limits;
 
-const MATRIX_FORMATS: &[(&'static str, (&'static str, &'static str))] = &[
+const DUAL_TAGS: &[(&'static str, (&'static str, &'static str))] = &[
     ("_", ("<em>", "</em>")),
     ("*", ("<strong>", "</strong>")),
     ("~", ("<strike>", "</strike>")),
@@ -11,6 +11,14 @@ const MATRIX_FORMATS: &[(&'static str, (&'static str, &'static str))] = &[
     ("```language", ("<pre><code class=\"language-{}\">", "</code></pre>")),
     (">", ("<blockquote>", "</blockquote>")),
     ("||", ("<span data-mx-spoiler>", "</span>")),
+];
+
+const SINGLE_TAGS: &[(&'static str, &'static str)] = &[
+    (">>", ""),
+    ("```>", ""),
+    ("\\", ""),
+    ("&lt;", "&lt;"),
+    ("&gt;", "&gt;"),
 ];
 
 #[pyfunction]
@@ -24,19 +32,19 @@ pub fn format_for_matrix(body: String, mentions: Option<Vec<(String, usize, usiz
     let styles: Vec<(String, usize, usize, usize, usize)> = parse_with_limits(&chars, 0, chars.len() - 1, 0);
     let mut tags: Vec<(usize, String, usize)> = Vec::with_capacity(styles.len() * 2);
     for (keyword, start, remove_start, end, remove_end) in styles {
-        if MATRIX_FORMATS.iter().any(|&(k, _)| k == keyword) {
+        if DUAL_TAGS.iter().any(|&(k, _)| k == keyword) {
             let opening_tag = if keyword == "```language" {
-                MATRIX_FORMATS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.clone()
+                DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.clone()
                 .replace("{}", &chars[start+3..remove_start-1]
                 .into_iter()
                 .collect::<String>())
             } else {
-                MATRIX_FORMATS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.clone().to_owned()
+                DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.clone().to_owned()
             };
             tags.push((start, opening_tag, remove_start));
-            tags.push((end, MATRIX_FORMATS.iter().find(|&&(k, _)| k == keyword).unwrap().1.1.clone().to_owned(), remove_end));
-        } else if keyword == ">>" || keyword == "```>" || keyword == "\\" {
-            tags.push((start, String::new(), start+1));
+            tags.push((end, DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.1.clone().to_owned(), remove_end));
+        } else if SINGLE_TAGS.iter().any(|&(k, _)| k == keyword) {
+            tags.push((start, SINGLE_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.to_owned(), start+1));
         }
     }
     for (mxid, start, end) in mentions {

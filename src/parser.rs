@@ -22,10 +22,17 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
                 styles.append(&mut parse_with_limits(chars, index + 1, to, depth + 1));
                 index = to;
                 continue;
-            }
-            if is_nested_quote(chars, index, depth) {
+            } else if is_nested_quote(chars, index, depth) {
                 styles.push((">>".to_owned(), index, index + 1, index + 1, index + 1));
+            } else {
+                styles.push(("&gt;".to_owned(), index, index + 1, index + 1, index + 1));
             }
+            index += 1;
+            continue;
+        }
+
+        if c == '<' {
+            styles.push(("&lt;".to_owned(), index, index + 1, index + 1, index + 1));
             index += 1;
             continue;
         }
