@@ -52,7 +52,7 @@ pub fn format_for_matrix(body: String, mentions: Option<Vec<(String, usize, usiz
             // index is at \n, add 1 to skip that one
             let substring = chars[index + 1..replace_newlines_to].into_iter().collect::<String>();
             chars = [&chars[..index + 1], &substring.replace('\n', "<br>").chars().collect::<Vec<char>>()[..], &chars[replace_newlines_to..]].concat();
-        } else if tag == "<pre><code>" {
+        } else if tag.starts_with("<pre>") {
             replace_newlines_to = index;
         }
 
