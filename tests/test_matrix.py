@@ -37,7 +37,7 @@ def test_basic():
         assert(format_for_matrix(test) == formatted_body)
 ```
 """
-    formatted_body = '<br><pre><code class="language-python">    def test_basic():<br>        test = "_underline_"<br>        formatted_body = "<em>underline</em>"<br>        assert(format_for_matrix(test) == formatted_body)</code></pre><br>'
+    formatted_body = '<br><pre><code class="language-python">    def test_basic():\n        test = "_underline_"\n        formatted_body = "<em>underline</em>"\n        assert(format_for_matrix(test) == formatted_body)</code></pre><br>'
     assert(format_for_matrix(test) == formatted_body)
 
     test = "```\ncode block\n```"
