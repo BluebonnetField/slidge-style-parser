@@ -301,3 +301,23 @@ def test_weird_utf8():
     test = "~\u200b~"
     formatted_body = "<strike>\u200b</strike>"
     assert(format_for_matrix(test) == formatted_body)
+
+    test = "<element>"
+    formatted_body = "&lt;element&gt;"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "< element >"
+    formatted_body = "&lt; element &gt;"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "< element>"
+    formatted_body = "&lt; element&gt;"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "<element >"
+    formatted_body = "&lt;element &gt;"
+    assert(format_for_matrix(test) == formatted_body)
+
+    test = "<element> malicious script </element>"
+    formatted_body = "&lt;element&gt; malicious script &lt;/element&gt;"
+    assert(format_for_matrix(test) == formatted_body)
