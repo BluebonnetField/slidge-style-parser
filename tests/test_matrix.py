@@ -80,7 +80,7 @@ def test_quotes():
     assert(format_for_matrix(test) == formatted_body)
 
     test = ">single arrow ->"
-    formatted_body = "<blockquote>single arrow -></blockquote>"
+    formatted_body = "<blockquote>single arrow -&gt;</blockquote>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = ">single\n>grouped"
@@ -96,7 +96,7 @@ def test_quotes():
     assert(format_for_matrix(test) == formatted_body)
 
     test = ">>double\n&>not quote"
-    formatted_body = "<blockquote><blockquote>double</blockquote></blockquote><br>&>not quote"
+    formatted_body = "<blockquote><blockquote>double</blockquote></blockquote><br>&&gt;not quote"
     assert(format_for_matrix(test) == formatted_body)
 
     test = ">>double\n>grouped single"
@@ -176,7 +176,7 @@ def test_nested():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "*bold star >*< star bold*"
-    formatted_body = "<strong>bold star >*< star bold</strong>"
+    formatted_body = "<strong>bold star &gt;*&lt; star bold</strong>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "*_bold*_"
@@ -201,11 +201,11 @@ def test_no_changes():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "arrow ->"
-    formatted_body = "arrow ->"
+    formatted_body = "arrow -&gt;"
     assert(format_for_matrix(test) == formatted_body)
 
     test = " > no quote"
-    formatted_body = " > no quote"
+    formatted_body = " &gt; no quote"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "_not underlined"
@@ -250,7 +250,7 @@ def test_assorted():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||"
-    formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> >not quote <span data-mx-spoiler>spoiler</span><br><blockquote>quote</blockquote><br>nothing<br>nothing<br><blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
+    formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> &gt;not quote <span data-mx-spoiler>spoiler</span><br><blockquote>quote</blockquote><br>nothing<br>nothing<br><blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "```\nhacker\ncode\n```\n\n```\nhacker\ncode\n```"
