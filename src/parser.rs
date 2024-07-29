@@ -95,7 +95,7 @@ pub fn parse_with_limits(chars: &Vec<char>, start: usize, end: usize, depth: usi
                         styles.append(&mut parse_with_limits(chars, index + 1, to - 1, depth));
                     }
                 }
-                index = to;
+                index = to + 1;
             }
             None => ()
         }
