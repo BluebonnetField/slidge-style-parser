@@ -34,15 +34,15 @@ pub fn format_for_matrix(body: String, mentions: Option<Vec<(String, usize, usiz
     for (keyword, start, remove_start, end, remove_end) in styles {
         if DUAL_TAGS.iter().any(|&(k, _)| k == keyword) {
             let opening_tag = if keyword == "```language" {
-                DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.clone()
+                DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0
                 .replace("{}", &chars[start+3..remove_start-1]
                 .into_iter()
                 .collect::<String>())
             } else {
-                DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.clone().to_owned()
+                DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.0.to_owned()
             };
             tags.push((start, opening_tag, remove_start));
-            tags.push((end, DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.1.clone().to_owned(), remove_end));
+            tags.push((end, DUAL_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.1.to_owned(), remove_end));
         } else if SINGLE_TAGS.iter().any(|&(k, _)| k == keyword) {
             tags.push((start, SINGLE_TAGS.iter().find(|&&(k, _)| k == keyword).unwrap().1.to_owned(), start+1));
         }
