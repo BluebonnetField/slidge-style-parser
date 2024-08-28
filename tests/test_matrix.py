@@ -1,16 +1,5 @@
 from slidge_style_parser import format_for_matrix
 
-MATRIX_FORMATS = {
-    "_": ("<em>", "</em>"),
-    "*": ("<strong>", "</strong>"),
-    "~": ("<strike>", "</strike>"),
-    "`": ("<code>", "</code>"),
-    "```": ("<pre><code>", "</code></pre>"),
-    "```language": ("<pre><code class=\"language-{}\">", "</code></pre>"),
-    ">": ("<blockquote>", "</blockquote>"),
-    "||": ("<span data-mx-spoiler>", "</span>"),
-    "\n": ("<br>", "")
-}
 
 def test_basic():
     test = "_underline_"
@@ -22,7 +11,7 @@ def test_basic():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "~strikethrough~"
-    formatted_body = "<strike>strikethrough</strike>"
+    formatted_body = "<s>strikethrough</s>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "`code span`"
@@ -168,11 +157,11 @@ def test_nested():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "*_~`code span`~_*"
-    formatted_body = "<strong><em><strike><code>code span</code></strike></em></strong>"
+    formatted_body = "<strong><em><s><code>code span</code></s></em></strong>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = ">*_~`code span`~_*"
-    formatted_body = "<blockquote><strong><em><strike><code>code span</code></strike></em></strong></blockquote>"
+    formatted_body = "<blockquote><strong><em><s><code>code span</code></s></em></strong></blockquote>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "*bold star >*< star bold*"
@@ -246,11 +235,11 @@ def test_assorted():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "in the ~middle~ here"
-    formatted_body = "in the <strike>middle</strike> here"
+    formatted_body = "in the <s>middle</s> here"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "_underline_ *bold* ~strikethrough~ >not quote ||spoiler||\n>quote\nnothing\nnothing\n>>>>another quote with ||~_*```four```*_~||"
-    formatted_body = "<em>underline</em> <strong>bold</strong> <strike>strikethrough</strike> &gt;not quote <span data-mx-spoiler>spoiler</span><br><blockquote>quote</blockquote><br>nothing<br>nothing<br><blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><strike><em><strong>```four```</strong></em></strike></span></blockquote></blockquote></blockquote></blockquote>"
+    formatted_body = "<em>underline</em> <strong>bold</strong> <s>strikethrough</s> &gt;not quote <span data-mx-spoiler>spoiler</span><br><blockquote>quote</blockquote><br>nothing<br>nothing<br><blockquote><blockquote><blockquote><blockquote>another quote with <span data-mx-spoiler><s><em><strong>```four```</strong></em></s></span></blockquote></blockquote></blockquote></blockquote>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "```\nhacker\ncode\n```\n\n```\nhacker\ncode\n```"
@@ -299,7 +288,7 @@ def test_weird_utf8():
     assert(format_for_matrix(test) == formatted_body)
 
     test = "~\u200b~"
-    formatted_body = "<strike>\u200b</strike>"
+    formatted_body = "<s>\u200b</s>"
     assert(format_for_matrix(test) == formatted_body)
 
     test = "<element>"
