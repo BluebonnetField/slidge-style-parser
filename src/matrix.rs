@@ -5,7 +5,7 @@ use crate::parser::parse_with_limits;
 const DUAL_TAGS: &[(&'static str, (&'static str, &'static str))] = &[
     ("_", ("<em>", "</em>")),
     ("*", ("<strong>", "</strong>")),
-    ("~", ("<strike>", "</strike>")),
+    ("~", ("<s>", "</s>")),
     ("`", ("<code>", "</code>")),
     ("```", ("<pre><code>", "</code></pre>")),
     ("```language", ("<pre><code class=\"language-{}\">", "</code></pre>")),
